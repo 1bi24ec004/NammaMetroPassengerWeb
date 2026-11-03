@@ -29,7 +29,7 @@
             <label for="station">SELECT YOUR STATION</label>
 
             <select id="station">
-                <option value="">Loading Stations...</option>
+                <option value="National College">National College</option>
             </select>
         </section>
 
@@ -89,10 +89,36 @@
             </div>
 
         </section>
+
         <!-- Approximate Train Positions -->
 <section class="current-station">
 
     <h2>Approximate train positions</h2>
+
+    <!-- Towards Silk Institute -->
+    <div class="position-card">
+
+        <p class="direction">TOWARDS SILK INSTITUTE</p>
+
+        <div class="route-line">
+
+            <span class="route-end">Madavara</span>
+
+            <div class="route-track">
+                <div class="route-progress silk-progress">
+                    <span class="train-marker">🚆</span>
+                </div>
+            </div>
+
+            <span class="route-end">Silk Institute</span>
+
+        </div>
+
+        <p class="position-label">
+            Approximate station: <strong id="silk-position">Awaiting timetable</strong>
+        </p>
+
+    </div>
 
     <!-- Towards Madavara -->
     <div class="position-card">
@@ -119,30 +145,7 @@
 
     </div>
 
-    <!-- Towards Silk Institute -->
-    <div class="position-card">
-
-        <p class="direction">TOWARDS SILK INSTITUTE</p>
-
-        <div class="route-line">
-
-            <span class="route-end">Madavara</span>
-
-            <div class="route-track">
-                <div class="route-progress silk-progress">
-                    <span class="train-marker">🚆</span>
-                </div>
-            </div>
-
-            <span class="route-end">Silk Institute</span>
-
-        </div>
-
-        <p class="position-label">
-            Approximate station: <strong id="silk-position">Awaiting timetable</strong>
-        </p>
-
-    </div>
+</section>
 
 </section>
         <!-- Footer -->
