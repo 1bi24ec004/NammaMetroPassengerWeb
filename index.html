@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Namma Metro - Passenger Information</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="dashboard">
+
+        <!-- Header -->
+        <header class="header">
+            <div>
+                <h1>NAMMA METRO</h1>
+                <p>GREEN LINE · PASSENGER INFORMATION</p>
+            </div>
+
+            <span class="status">TIMETABLE MODE</span>
+        </header>
+
+        <!-- Station Selection -->
+        <section class="station-selector">
+            <label for="station">SELECT YOUR STATION</label>
+
+            <select id="station">
+                <option value="">Loading Stations...</option>
+            </select>
+        </section>
+
+        <!-- Upcoming Trains -->
+        <section class="trains-section">
+
+            <h2>Upcoming trains</h2>
+
+            <div class="direction-container">
+
+                <!-- Madavara Direction -->
+                <article class="train-card">
+
+                    <p class="direction">
+                        TOWARDS MADAVARA
+                    </p>
+
+                    <h3 id="madavara-countdown">04 min</h3>
+
+                    <p class="arrival">
+                        Next arrival · Demonstration
+                    </p>
+
+                    <hr>
+
+                    <p class="following-title">Following trains</p>
+
+                    <p class="following-times">
+                        10:42 · 10:49 · 10:56
+                    </p>
+
+                </article>
+
+                <!-- Silk Institute Direction -->
+                <article class="train-card">
+
+                    <p class="direction">
+                        TOWARDS SILK INSTITUTE
+                    </p>
+
+                    <h3 id="silk-countdown">06 min</h3>
+
+                    <p class="arrival">
+                        Next arrival · Demonstration
+                    </p>
+
+                    <hr>
+
+                    <p class="following-title">Following trains</p>
+
+                    <p class="following-times">
+                        10:44 · 10:51 · 10:58
+                    </p>
+
+                </article>
+
+            </div>
+
+        </section>
+        <!-- Approximate Train Positions -->
+<section class="current-station">
+
+    <h2>Approximate train positions</h2>
+
+    <!-- Towards Madavara -->
+    <div class="position-card">
+
+        <p class="direction">TOWARDS MADAVARA</p>
+
+        <div class="route-line">
+
+            <span class="route-end">Silk Institute</span>
+
+            <div class="route-track">
+                <div class="route-progress madavara-progress">
+                    <span class="train-marker">🚆</span>
+                </div>
+            </div>
+
+            <span class="route-end">Madavara</span>
+
+        </div>
+
+        <p class="position-label">
+            Approximate station: <strong id="madavara-position">Awaiting timetable</strong>
+        </p>
+
+    </div>
+
+    <!-- Towards Silk Institute -->
+    <div class="position-card">
+
+        <p class="direction">TOWARDS SILK INSTITUTE</p>
+
+        <div class="route-line">
+
+            <span class="route-end">Madavara</span>
+
+            <div class="route-track">
+                <div class="route-progress silk-progress">
+                    <span class="train-marker">🚆</span>
+                </div>
+            </div>
+
+            <span class="route-end">Silk Institute</span>
+
+        </div>
+
+        <p class="position-label">
+            Approximate station: <strong id="silk-position">Awaiting timetable</strong>
+        </p>
+
+    </div>
+
+</section>
+        <!-- Footer -->
+        <footer class="footer">
+
+            <span>Offline-ready after first visit</span>
+
+            <span id="clock">--:--:--</span>
+
+        </footer>
+
+        <p class="disclaimer">
+            Illustrative interface only. Timings shown are demonstration values,
+            not live train information.
+        </p>
+
+    </main>
+<script src="script.js"></script>
+</body>
+</html>

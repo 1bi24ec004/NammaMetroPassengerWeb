@@ -1,0 +1,310 @@
+
+/* Basic page settings */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background-color: #080d16;
+    color: #f5f7fb;
+    font-family: Arial, sans-serif;
+}
+
+/* Main dashboard */
+.dashboard {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #111f35;
+    border: 1px solid #26364e;
+    border-radius: 24px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #ffffff;
+}
+
+.header p {
+    margin: 5px 0 0;
+    color: #a9bad0;
+    font-size: 14px;
+}
+
+.status {
+    background-color: #073b30;
+    color: #00d084;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Station selector */
+.station-selector {
+    background-color: #20314c;
+    padding: 18px;
+    border-radius: 16px;
+    margin-bottom: 22px;
+}
+
+.station-selector label {
+    display: block;
+    color: #a9bad0;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.station-selector select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.station-selector select option {
+    background-color: #20314c;
+    color: white;
+}
+
+/* Upcoming trains */
+.trains-section h2 {
+    font-size: 20px;
+    margin: 0 0 18px;
+}
+
+.direction-container {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+/* Train cards */
+.train-card {
+    background-color: #20314c;
+    padding: 18px;
+    border-radius: 16px;
+    min-width: 0;
+}
+
+.direction {
+    color: #a9bad0;
+    font-size: 14px;
+    margin: 0 0 18px;
+}
+
+.train-card h3 {
+    font-size: 34px;
+    margin: 0 0 12px;
+}
+
+.arrival {
+    color: #a9bad0;
+    font-size: 14px;
+    margin: 0;
+}
+
+.train-card hr {
+    border: none;
+    border-top: 1px solid #52627a;
+    margin: 22px 0;
+}
+
+.following-title {
+    font-size: 14px;
+    margin: 0 0 14px;
+}
+
+.following-times {
+    font-size: 17px;
+    margin: 0;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+/* Approximate current station */
+.current-station {
+    background-color: #20314c;
+    padding: 20px;
+    border-radius: 16px;
+    margin-top: 16px;
+}
+
+.current-station h3 {
+    font-size: 23px;
+    margin: 0 0 12px;
+}
+
+/* Footer */
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    color: #a9bad0;
+    font-size: 14px;
+    margin-top: 25px;
+}
+
+#clock {
+    color: #ffffff;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.disclaimer {
+    color: #a9bad0;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 24px;
+}
+
+/* Tablet and mobile layout */
+@media (max-width: 650px) {
+
+    body {
+        padding: 8px;
+    }
+
+    .dashboard {
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    .header h1 {
+        font-size: 23px;
+    }
+
+    .header p {
+        font-size: 12px;
+    }
+
+    .status {
+        font-size: 11px;
+        padding: 6px 9px;
+    }
+
+    .direction-container {
+        grid-template-columns: 1fr;
+    }
+
+    .train-card h3 {
+        font-size: 30px;
+    }
+
+    .station-selector select {
+        font-size: 18px;
+    }
+
+    .footer {
+        font-size: 12px;
+    }
+}
+
+/* Very narrow phone screens */
+@media (max-width: 360px) {
+
+    .header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .header h1 {
+        font-size: 21px;
+    }
+
+    .footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+
+/* Approximate train position indicators */
+
+.current-station h2 {
+    font-size: 20px;
+    margin: 0 0 20px;
+}
+
+.position-card {
+    background-color: #172943;
+    border: 1px solid #30445f;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+}
+
+.route-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.route-end {
+    color: #a9bad0;
+    font-size: 11px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.route-track {
+    flex: 1;
+    height: 7px;
+    background-color: #52627a;
+    border-radius: 10px;
+    position: relative;
+}
+
+.route-progress {
+    position: absolute;
+    height: 100%;
+    width: 65%;
+    border-radius: 10px;
+}
+
+.madavara-progress {
+    background-color: #38a9f5;
+}
+
+.silk-progress {
+    background-color: #22c55e;
+    width: 35%;
+}
+
+.train-marker {
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 21px;
+}
+
+.position-label {
+    color: #a9bad0;
+    font-size: 13px;
+    margin: 0;
+}
+
+.position-label strong {
+    color: #ffffff;
+}
