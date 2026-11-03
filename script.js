@@ -656,6 +656,39 @@ testTimetables();
 
 // Automatically update Madavara passenger display
 
+// Calculate approximate train progress along the entire route
+function calculateTrainProgress(selectedIndex, remainingMinutes, direction) {
+
+    let totalRouteMinutes = 0;
+    let distanceFromStart = 0;
+
+    for (let i = 1; i < currentStations.length; i++) {
+
+        const travelMinutes = Number(
+            currentStations[i].minutes_from_previous
+        );
+
+        totalRouteMinutes += travelMinutes;
+
+        if (i <= selectedIndex) {
+            distanceFromStart += travelMinutes;
+        }
+    }
+
+    if (totalRouteMinutes <= 0) return 0;
+
+    let progress;
+
+    if (direction === "madavara") {
+        progress = distanceFromStart - remainingMinutes;
+    } else {
+        progress = totalRouteMinutes - distanceFromStart - remainingMinutes;
+    }
+
+    progress = Math.max(0, Math.min(totalRouteMinutes, progress));
+
+    return (progress / totalRouteMinutes) * 100;
+}
 function updateMadavaraDisplay() {
 
     if (!currentTimetable || currentStations.length === 0) {
@@ -712,6 +745,16 @@ function updateMadavaraDisplay() {
     const selectedIndex = currentStations.findIndex(
         station => station.name === selectedStation
     );
+
+    // Update Madavara train marker position
+const madavaraProgress = calculateTrainProgress(
+    selectedIndex,
+    remainingMinutesExact,
+    "madavara"
+);
+
+document.querySelector(".madavara-progress").style.width =
+    madavaraProgress + "%";
 
     let estimatedStation = selectedStation;
     let accumulatedMinutes = 0;
@@ -797,6 +840,16 @@ function updateSilkDisplay() {
     const selectedIndex = currentStations.findIndex(
         station => station.name === selectedStation
     );
+
+    // Update Silk Institute train marker position
+const silkProgress = calculateTrainProgress(
+    selectedIndex,
+    remainingMinutesExact,
+    "silk"
+);
+
+document.querySelector(".silk-progress").style.width =
+    silkProgress + "%";
 
     let estimatedStation = selectedStation;
     let accumulatedMinutes = 0;
