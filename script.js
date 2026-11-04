@@ -698,6 +698,13 @@ function updateMadavaraDisplay() {
     if (madavaraTrains.length === 0) return;
 
     const nextTrain = madavaraTrains[0];
+    const destinationName =
+    stationNames[nextTrain.destination]?.english ||
+    nextTrain.destination ||
+    "Not available";
+
+document.getElementById("madavara-destination").textContent =
+    destinationName;
 
     const remainingMilliseconds = nextTrain.arrivalDate - new Date();
 
@@ -726,16 +733,6 @@ function updateMadavaraDisplay() {
     const selectedIndex = currentStations.findIndex(
         station => station.name === selectedStation
     );
-
-    // Update Madavara train marker position
-const madavaraProgress = calculateTrainProgress(
-    selectedIndex,
-    remainingMinutesExact,
-    "madavara"
-);
-
-document.querySelector(".madavara-progress").style.width =
-    madavaraProgress + "%";
 
     let estimatedStation = selectedStation;
     let accumulatedMinutes = 0;
@@ -790,6 +787,13 @@ function updateSilkDisplay() {
     if (silkTrains.length === 0) return;
 
     const nextTrain = silkTrains[0];
+    const destinationName =
+    stationNames[nextTrain.destination]?.english ||
+    nextTrain.destination ||
+    "Not available";
+
+document.getElementById("silk-destination").textContent =
+    destinationName;
 
     const remainingMilliseconds = nextTrain.arrivalDate - new Date();
 
@@ -818,16 +822,6 @@ function updateSilkDisplay() {
     const selectedIndex = currentStations.findIndex(
         station => station.name === selectedStation
     );
-
-    // Update Silk Institute train marker position
-const silkProgress = calculateTrainProgress(
-    selectedIndex,
-    remainingMinutesExact,
-    "silk"
-);
-
-document.querySelector(".silk-progress").style.width =
-    silkProgress + "%";
 
     let estimatedStation = selectedStation;
     let accumulatedMinutes = 0;
