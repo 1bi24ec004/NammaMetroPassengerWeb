@@ -555,32 +555,6 @@ console.log("00:05 shifted backward by 10 minutes:",
 console.log("23:55 shifted forward by 10 minutes:",
     getNextOccurrence(1445, testCurrentTime).toString()
 );
-// Test upcoming trains for National College
-
-const rajajinagarTestOffsets = calculateStationOffsets(
-    currentStations,
-    "Rajajinagar"
-);
-
-const testNow = new Date();
-testNow.setHours(10, 35, 0, 0);
-
-const testMadavaraTrains = getUpcomingTrains(
-    currentTimetable.platforms.madavara.arrivals,
-    rajajinagarTestOffsets.madavara,
-    testNow
-);
-
-const testSilkTrains = getUpcomingTrains(
-    currentTimetable.platforms.silk_institute.arrivals,
-    rajajinagarTestOffsets.silk,
-    testNow
-);
-
-console.log("Upcoming Madavara trains:", testMadavaraTrains.slice(0, 5));
-
-console.log("Upcoming Silk Institute trains:", testSilkTrains.slice(0, 5));
-
     console.log("KR Market offsets:",
     calculateStationOffsets(data.route.stations, "KR Market")
 );
@@ -651,7 +625,15 @@ if (new Date().getDay() === 1) {
     }
 }
 
-testTimetables();
+testTimetables().then(() => {
+    if (currentTimetable) {
+        updateMadavaraDisplay();
+        updateSilkDisplay();
+
+        setInterval(updateMadavaraDisplay, 1000);
+        setInterval(updateSilkDisplay, 1000);
+    }
+});
 
 // Automatically update Madavara passenger display
 
@@ -777,9 +759,6 @@ document.querySelector(".madavara-progress").style.width =
     document.getElementById("madavara-position").textContent =
         stationDisplay;
 }
-// Refresh Madavara display every second
-updateMadavaraDisplay();
-setInterval(updateMadavaraDisplay, 1000);
 
 // Automatically update Silk Institute passenger display
 
@@ -872,7 +851,3 @@ document.querySelector(".silk-progress").style.width =
     document.getElementById("silk-position").textContent =
         stationDisplay;
 }
-
-// Refresh Silk Institute display every second
-updateSilkDisplay();
-setInterval(updateSilkDisplay, 1000);
