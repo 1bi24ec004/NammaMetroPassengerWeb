@@ -228,6 +228,15 @@ function populateStationDropdown(stations) {
         return nameA.localeCompare(nameB);
     });
 
+    stationSelect.innerHTML = "";
+
+const placeholder = document.createElement("option");
+placeholder.value = "";
+placeholder.textContent = "Select Station";
+placeholder.disabled = true;
+placeholder.selected = true;
+
+stationSelect.appendChild(placeholder);
     sortedStations.forEach(station => {
 
         const names = stationNames[station.name];
@@ -251,6 +260,7 @@ let currentStations = [];
 // Stores the currently active timetable
 
 let currentTimetable = null;
+let passengerStationSelected = false;
 // Detect passenger station selection and calculate upcoming trains
 let allTimetables = {};
 
@@ -271,6 +281,10 @@ document.getElementById("station").addEventListener("change", function () {
         console.log("Timetable or station offsets unavailable.");
         return;
     }
+    passengerStationSelected = true;
+
+document.querySelector(".trains-section").hidden = false;
+document.querySelector(".current-station").hidden = false;
 
     const now = new Date();
 
@@ -293,6 +307,8 @@ document.getElementById("station").addEventListener("change", function () {
     console.log("Selected station - Upcoming Silk Institute trains:",
         silkTrains.slice(0, 5)
     );
+updateMadavaraDisplay();
+updateSilkDisplay();
 });
 // Calculate station offsets from National College
 
@@ -624,14 +640,20 @@ if (new Date().getDay() === 1) {
         console.log("Active timetable selected:", currentTimetable);
     }
 }
-
 testTimetables().then(() => {
     if (currentTimetable) {
-        updateMadavaraDisplay();
-        updateSilkDisplay();
 
-        setInterval(updateMadavaraDisplay, 1000);
-        setInterval(updateSilkDisplay, 1000);
+        if (passengerStationSelected) {
+            updateMadavaraDisplay();
+            updateSilkDisplay();
+        }
+
+        setInterval(() => {
+            if (passengerStationSelected) {
+                updateMadavaraDisplay();
+                updateSilkDisplay();
+            }
+        }, 1000);
     }
 });
 
@@ -672,9 +694,10 @@ function calculateTrainProgress(selectedIndex, remainingMinutes, direction) {
 }
 function updateMadavaraDisplay() {
 
-    if (!currentTimetable || currentStations.length === 0) {
-        return;
-    }
+    if (!currentTimetable || currentStations.length === 0 ||
+    !passengerStationSelected) {
+    return;
+}
 
     const selectedStation = document.getElementById("station").value;
 
@@ -761,9 +784,10 @@ document.getElementById("madavara-destination").textContent =
 
 function updateSilkDisplay() {
 
-    if (!currentTimetable || currentStations.length === 0) {
-        return;
-    }
+   if (!currentTimetable || currentStations.length === 0 ||
+    !passengerStationSelected) {
+    return;
+}
 
     const selectedStation = document.getElementById("station").value;
 
