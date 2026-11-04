@@ -291,16 +291,20 @@ document.querySelector(".current-station").hidden = false;
     const now = new Date();
 
     const madavaraTrains = getUpcomingTrains(
-        currentTimetable.platforms.madavara.arrivals,
-        offsets.madavara,
-        now
-    );
+    currentTimetable.platforms.madavara.arrivals,
+    offsets.madavara,
+    now,
+    selectedStation,
+    "madavara"
+);
 
     const silkTrains = getUpcomingTrains(
-        currentTimetable.platforms.silk_institute.arrivals,
-        offsets.silk,
-        now
-    );
+    currentTimetable.platforms.silk_institute.arrivals,
+    offsets.silk,
+    now,
+    selectedStation,
+    "silk"
+);
 
     console.log("Selected station - Upcoming Madavara trains:",
         madavaraTrains.slice(0, 5)
@@ -437,20 +441,67 @@ function getAdjustedArrivals(arrivals, offsetMinutes) {
     });
 
 }
-// Find upcoming trains from the complete arrival list
-function getUpcomingTrains(arrivals, offsetMinutes, currentDate) {
+// Find upcoming trains that can reach the passenger's selected station
+function getUpcomingTrains(
+    arrivals,
+    offsetMinutes,
+    currentDate,
+    selectedStation,
+    direction
+) {
 
     const upcomingTrains = [];
 
+    // Find the passenger's position in the original route order
+    const selectedIndex = currentStations.findIndex(
+        station => station.name === selectedStation
+    );
+
+    if (selectedIndex === -1) {
+        console.error("Selected station not found:", selectedStation);
+        return [];
+    }
+
     arrivals.forEach(arrival => {
 
-        // Convert original timetable time into continuous minutes
+        // Find this train's terminal destination in the route
+        const destinationIndex = currentStations.findIndex(
+            station => station.name === arrival.destination
+        );
+
+        // Ignore entries with an unrecognised destination
+        if (destinationIndex === -1) {
+            console.warn("Unknown train destination:", arrival.destination);
+            return;
+        }
+
+        // Check whether this train can reach the selected station
+        let canReachSelectedStation = false;
+
+        if (direction === "madavara") {
+
+            // Madavara direction travels backwards through the route
+            canReachSelectedStation =
+                selectedIndex >= destinationIndex;
+
+        } else if (direction === "silk") {
+
+            // Silk Institute direction travels forwards through the route
+            canReachSelectedStation =
+                selectedIndex <= destinationIndex;
+        }
+
+        // Do not display trains that terminate before the selected station
+        if (!canReachSelectedStation) {
+            return;
+        }
+
+        // Existing arrival-time calculation remains unchanged
         const arrivalMinutes = getContinuousArrivalTime(
             arrival.time,
             offsetMinutes
         );
 
-        // Find the next actual occurrence
         const arrivalDate = getNextOccurrence(
             arrivalMinutes,
             currentDate
@@ -468,7 +519,7 @@ function getUpcomingTrains(arrivals, offsetMinutes, currentDate) {
         }
     });
 
-    // Sort trains by their actual arrival date and time
+    // Existing chronological sorting remains unchanged
     upcomingTrains.sort((a, b) =>
         a.arrivalDate - b.arrivalDate
     );
@@ -715,12 +766,24 @@ function updateMadavaraDisplay() {
     if (!offsets) return;
 
     const madavaraTrains = getUpcomingTrains(
-        currentTimetable.platforms.madavara.arrivals,
-        offsets.madavara,
-        new Date()
-    );
+    currentTimetable.platforms.madavara.arrivals,
+    offsets.madavara,
+    new Date(),
+    selectedStation,
+    "madavara"
+);
 
-    if (madavaraTrains.length === 0) return;
+    if (madavaraTrains.length === 0) {
+    document.getElementById("madavara-destination").textContent = "No service";
+    document.getElementById("madavara-countdown").textContent = "--";
+    document.querySelector("#madavara-countdown + .arrival").textContent =
+        "No train reaches this station";
+    document.querySelector("#madavara-countdown")
+        .closest(".train-card")
+        .querySelector(".following-times").textContent = "";
+    document.getElementById("madavara-position").textContent = "--";
+    return;
+}
 
     const nextTrain = madavaraTrains[0];
     const destinationName =
@@ -774,6 +837,22 @@ document.getElementById("madavara-destination").textContent =
             break;
         }
     }
+    // Prevent the estimated station from going beyond the train's destination
+const destinationIndex = currentStations.findIndex(
+    station => station.name === nextTrain.destination
+);
+
+const estimatedIndex = currentStations.findIndex(
+    station => station.name === estimatedStation
+);
+
+if (
+    destinationIndex !== -1 &&
+    estimatedIndex !== -1 &&
+    estimatedIndex < destinationIndex
+) {
+    estimatedStation = currentStations[destinationIndex].name;
+}
 
     const stationDisplay =
         stationNames[estimatedStation]?.english || estimatedStation;
@@ -805,12 +884,24 @@ function updateSilkDisplay() {
     if (!offsets) return;
 
     const silkTrains = getUpcomingTrains(
-        currentTimetable.platforms.silk_institute.arrivals,
-        offsets.silk,
-        new Date()
-    );
+    currentTimetable.platforms.silk_institute.arrivals,
+    offsets.silk,
+    new Date(),
+    selectedStation,
+    "silk"
+);
 
-    if (silkTrains.length === 0) return;
+    if (silkTrains.length === 0) {
+    document.getElementById("silk-destination").textContent = "No service";
+    document.getElementById("silk-countdown").textContent = "--";
+    document.querySelector("#silk-countdown + .arrival").textContent =
+        "No train reaches this station";
+    document.querySelector("#silk-countdown")
+        .closest(".train-card")
+        .querySelector(".following-times").textContent = "";
+    document.getElementById("silk-position").textContent = "--";
+    return;
+}
 
     const nextTrain = silkTrains[0];
     const destinationName =
@@ -864,6 +955,22 @@ document.getElementById("silk-destination").textContent =
             break;
         }
     }
+    // Prevent the estimated station from going beyond the train's destination
+const destinationIndex = currentStations.findIndex(
+    station => station.name === nextTrain.destination
+);
+
+const estimatedIndex = currentStations.findIndex(
+    station => station.name === estimatedStation
+);
+
+if (
+    destinationIndex !== -1 &&
+    estimatedIndex !== -1 &&
+    estimatedIndex > destinationIndex
+) {
+    estimatedStation = currentStations[destinationIndex].name;
+}
 
     const stationDisplay =
         stationNames[estimatedStation]?.english || estimatedStation;
