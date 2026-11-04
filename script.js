@@ -469,7 +469,13 @@ async function testTimetables() {
             }
 
             const data = await response.json();
-            allTimetables[day] = data;
+
+if (!data || !data.route || !data.platforms) {
+    console.error("Invalid timetable data for:", day, data);
+    throw new Error("Timetable JSON is missing route or platforms");
+}
+
+allTimetables[day] = data;
 
             if (day === "weekday") {
                 
