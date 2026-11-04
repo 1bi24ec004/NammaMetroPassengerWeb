@@ -464,11 +464,13 @@ function getUpcomingTrains(
 
     arrivals.forEach(arrival => {
 
+    
         // Find this train's terminal destination in the route
-        const destinationIndex = currentStations.findIndex(
-            station => station.name === arrival.destination
-        );
-
+       const destinationIndex = currentStations.findIndex(
+    station =>
+        station.name === arrival.destination ||
+        (station.name === "Silk Inst." && arrival.destination === "Silk Institute")
+);
         // Ignore entries with an unrecognised destination
         if (destinationIndex === -1) {
             console.warn("Unknown train destination:", arrival.destination);
@@ -687,6 +689,10 @@ if (new Date().getDay() === 1) {
 
     if (currentTimetable) {
         currentStations = currentTimetable.route.stations;
+        console.log("Last route station:", currentStations[currentStations.length - 1].name);
+console.log("Silk Institute exists:", currentStations.some(
+    station => station.name === "Silk Institute"
+));
 
         populateStationDropdown(currentStations);
 
