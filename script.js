@@ -549,13 +549,6 @@ console.log("00:05 shifted backward by 10 minutes:",
 console.log("23:55 shifted forward by 10 minutes:",
     getNextOccurrence(1445, testCurrentTime).toString()
 );
-                console.log("Active timetable stored:", currentTimetable !== null);
-console.log("Madavara train count:",
-    currentTimetable.platforms.madavara.arrivals.length
-);
-console.log("Silk Institute train count:",
-    currentTimetable.platforms.silk_institute.arrivals.length
-);
 // Test upcoming trains for National College
 
 const rajajinagarTestOffsets = calculateStationOffsets(
