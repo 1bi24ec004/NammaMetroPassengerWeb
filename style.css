@@ -7,8 +7,8 @@
 body {
     margin: 0;
     padding: 20px;
-    background-color: #080d16;
-    color: #f5f7fb;
+    background-color: #edf5ef;
+    color: #20352a;
     font-family: Arial, sans-serif;
 }
 
@@ -18,8 +18,8 @@ body {
     max-width: 1100px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #111f35;
-    border: 1px solid #26364e;
+    background-color: #ffffff;
+    border: 1px solid #d5e6d9;
     border-radius: 24px;
 }
 
@@ -35,18 +35,18 @@ body {
 .header h1 {
     margin: 0;
     font-size: 28px;
-    color: #ffffff;
+    color: #087a45;
 }
 
 .header p {
     margin: 5px 0 0;
-    color: #a9bad0;
+    color: #638071;
     font-size: 14px;
 }
 
 .status {
-    background-color: #073b30;
-    color: #00d084;
+    background-color: #e0f2e6;
+    color: #087a45;
     padding: 7px 12px;
     border-radius: 20px;
     font-size: 13px;
@@ -56,7 +56,8 @@ body {
 
 /* Station selector */
 .station-selector {
-    background-color: #20314c;
+    background-color: #edf6ef;
+    border: 1px solid #c9dfce;
     padding: 18px;
     border-radius: 16px;
     margin-bottom: 22px;
@@ -64,7 +65,7 @@ body {
 
 .station-selector label {
     display: block;
-    color: #a9bad0;
+    color: #527460;
     font-size: 14px;
     margin-bottom: 10px;
 }
@@ -74,21 +75,22 @@ body {
     border: none;
     outline: none;
     background-color: transparent;
-    color: #ffffff;
+    color: #087a45;
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
 }
 
 .station-selector select option {
-    background-color: #20314c;
-    color: white;
+    background-color: #ffffff;
+    color: #20352a;
 }
 
 /* Upcoming trains */
 .trains-section h2 {
     font-size: 20px;
     margin: 0 0 18px;
+    color: #087a45;
 }
 
 .direction-container {
@@ -99,14 +101,15 @@ body {
 
 /* Train cards */
 .train-card {
-    background-color: #20314c;
+    background-color: #f1f7f2;
+    border: 1px solid #d5e6d9;
     padding: 18px;
     border-radius: 16px;
     min-width: 0;
 }
 
 .direction {
-    color: #a9bad0;
+    color: #527460;
     font-size: 14px;
     margin: 0 0 18px;
 }
@@ -114,23 +117,25 @@ body {
 .train-card h3 {
     font-size: 34px;
     margin: 0 0 12px;
+    color: #087a45;
 }
 
 .arrival {
-    color: #a9bad0;
+    color: #638071;
     font-size: 14px;
     margin: 0;
 }
 
 .train-card hr {
     border: none;
-    border-top: 1px solid #52627a;
+    border-top: 1px solid #cbded0;
     margin: 22px 0;
 }
 
 .following-title {
     font-size: 14px;
     margin: 0 0 14px;
+    color: #355d44;
 }
 
 .following-times {
@@ -138,11 +143,13 @@ body {
     margin: 0;
     line-height: 1.6;
     overflow-wrap: anywhere;
+    color: #20352a;
 }
 
 /* Approximate current station */
 .current-station {
-    background-color: #20314c;
+    background-color: #edf6ef;
+    border: 1px solid #d5e6d9;
     padding: 20px;
     border-radius: 16px;
     margin-top: 16px;
@@ -153,25 +160,96 @@ body {
     margin: 0 0 12px;
 }
 
+.current-station h2 {
+    font-size: 20px;
+    margin: 0 0 20px;
+    color: #087a45;
+}
+
+.position-card {
+    background-color: #ffffff;
+    border: 1px solid #d5e6d9;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+}
+
+.position-label {
+    color: #638071;
+    font-size: 13px;
+    margin: 0;
+}
+
+.position-label strong {
+    color: #087a45;
+}
+
+/* Route indicators */
+.route-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.route-end {
+    color: #638071;
+    font-size: 11px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.route-track {
+    flex: 1;
+    height: 7px;
+    background-color: #cbded0;
+    border-radius: 10px;
+    position: relative;
+}
+
+.route-progress {
+    position: absolute;
+    height: 100%;
+    width: 65%;
+    border-radius: 10px;
+}
+
+.madavara-progress {
+    background-color: #087a45;
+}
+
+.silk-progress {
+    background-color: #22a65b;
+    width: 35%;
+}
+
+.train-marker {
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 21px;
+}
+
 /* Footer */
 .footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    color: #a9bad0;
+    color: #638071;
     font-size: 14px;
     margin-top: 25px;
 }
 
 #clock {
-    color: #ffffff;
+    color: #087a45;
     font-weight: bold;
     white-space: nowrap;
 }
 
 .disclaimer {
-    color: #a9bad0;
+    color: #789083;
     font-size: 12px;
     line-height: 1.5;
     margin-top: 24px;
@@ -237,74 +315,63 @@ body {
     }
 }
 
+/* Welcome section */
 
-/* Approximate train position indicators */
-
-.current-station h2 {
-    font-size: 20px;
-    margin: 0 0 20px;
+.welcome-section {
+    margin-bottom: 22px;
+    background-color: #edf6ef;
+    border: 1px solid #d5e6d9;
+    border-radius: 16px;
+    overflow: hidden;
 }
 
-.position-card {
-    background-color: #172943;
-    border: 1px solid #30445f;
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 14px;
+.welcome-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 360px;
+    object-fit: contain;
+    margin: 0 auto;
 }
 
-.route-line {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 20px 0;
+.welcome-content {
+    padding: 20px;
 }
 
-.route-end {
-    color: #a9bad0;
-    font-size: 11px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.route-track {
-    flex: 1;
-    height: 7px;
-    background-color: #52627a;
-    border-radius: 10px;
-    position: relative;
-}
-
-.route-progress {
-    position: absolute;
-    height: 100%;
-    width: 65%;
-    border-radius: 10px;
-}
-
-.madavara-progress {
-    background-color: #38a9f5;
-}
-
-.silk-progress {
-    background-color: #22c55e;
-    width: 35%;
-}
-
-.train-marker {
-    position: absolute;
-    right: -12px;
-    top: 50%;
-    transform: translateY(-50%);
+.welcome-content h2 {
+    color: #087a45;
     font-size: 21px;
+    margin: 0 0 10px;
 }
 
-.position-label {
-    color: #a9bad0;
-    font-size: 13px;
-    margin: 0;
+.welcome-content p {
+    color: #527460;
+    font-size: 14px;
+    line-height: 1.6;
 }
 
-.position-label strong {
-    color: #ffffff;
+.route-map-link {
+    display: inline-block;
+    background-color: #087a45;
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.route-map-link:hover {
+    background-color: #065f36;
+}
+
+@media (max-width: 650px) {
+    .welcome-image {
+         height: auto;
+    max-height: 260px
+    }
+
+    .welcome-content h2 {
+        font-size: 18px;
+    }
 }
