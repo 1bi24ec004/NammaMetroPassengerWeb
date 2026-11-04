@@ -11,8 +11,10 @@ function updateClock() {
     document.getElementById("clock").textContent = time;
 }
 
-updateClock();
-setInterval(updateClock, 1000);
+document.addEventListener("DOMContentLoaded", () => {
+    updateClock();
+    setInterval(updateClock, 1000);
+});
 
 // Test loading all three timetable files
 
