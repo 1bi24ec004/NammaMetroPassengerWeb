@@ -420,7 +420,7 @@ function getNextOccurrence(arrivalMinutes, currentDate) {
         const candidate = new Date(serviceDay);
         candidate.setMinutes(arrivalMinutes);
 
-        if (candidate.getTime() + 60000 > currentDate.getTime()) {
+        if (candidate.getTime() + 40000 > currentDate.getTime()) {
             if (nextArrival === null || candidate < nextArrival) {
                 nextArrival = candidate;
             }
