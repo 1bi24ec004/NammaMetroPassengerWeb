@@ -691,7 +691,7 @@ if (new Date().getDay() === 1) {
         currentStations = currentTimetable.route.stations;
         console.log("Last route station:", currentStations[currentStations.length - 1].name);
 console.log("Silk Institute exists:", currentStations.some(
-    station => station.name === "Silk Institute"
+    station => station.name === "Silk Inst."
 ));
 
         populateStationDropdown(currentStations);
