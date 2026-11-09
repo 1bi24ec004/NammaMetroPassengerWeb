@@ -215,46 +215,66 @@ function getCurrentDayTimetable() {
     return allTimetables.weekday;
 }
 
-// Populate station dropdown
+// Populate source and destination station dropdowns
 
 function populateStationDropdown(stations) {
 
-    const stationSelect = document.getElementById("station");
+    const sourceSelect = document.getElementById("station");
 
-    stationSelect.innerHTML = "";
+    const destinationSelect =
+        document.getElementById("destination-station");
+
+    // Sort stations alphabetically for dropdown display only.
+    // currentStations itself remains in its original route order.
 
     const sortedStations = [...stations].sort((a, b) => {
+
         const nameA = stationNames[a.name]?.english || a.name;
         const nameB = stationNames[b.name]?.english || b.name;
 
         return nameA.localeCompare(nameB);
+
     });
 
-    stationSelect.innerHTML = "";
+    function populateSelect(selectElement, placeholderText) {
 
-const placeholder = document.createElement("option");
-placeholder.value = "";
-placeholder.textContent = "Select Station";
-placeholder.disabled = true;
-placeholder.selected = true;
+        selectElement.innerHTML = "";
 
-stationSelect.appendChild(placeholder);
-    sortedStations.forEach(station => {
+        const placeholder = document.createElement("option");
 
-        const names = stationNames[station.name];
+        placeholder.value = "";
+        placeholder.textContent = placeholderText;
+        placeholder.disabled = true;
+        placeholder.selected = true;
 
-        const option = document.createElement("option");
+        selectElement.appendChild(placeholder);
 
-        // Keep the exact JSON name as the internal value
-        option.value = station.name;
+        sortedStations.forEach(station => {
 
-        // Show full English and Kannada names
-        option.textContent = names
-            ? `${names.english} (${names.kannada})`
-            : station.name;
+            const names = stationNames[station.name];
 
-        stationSelect.appendChild(option);
-    });
+            const option = document.createElement("option");
+
+            // Preserve exact timetable JSON station name.
+            option.value = station.name;
+
+            option.textContent = names
+                ? `${names.english} (${names.kannada})`
+                : station.name;
+
+            selectElement.appendChild(option);
+
+        });
+
+    }
+
+    populateSelect(sourceSelect, "Select Source Station");
+
+    populateSelect(
+        destinationSelect,
+        "Select Destination Station"
+    );
+
 }
 // Stores the station sequence from the loaded timetable
 
@@ -361,6 +381,185 @@ function calculateStationOffsets(stations, selectedName) {
         madavara: madavaraOffset,
         silk: silkOffset
     };
+}
+// Calculate journey duration and route between two stations
+
+function calculateJourney(sourceName, destinationName) {
+
+    if (!currentStations || currentStations.length === 0) {
+        return null;
+    }
+
+    const sourceIndex = currentStations.findIndex(
+        station => station.name === sourceName
+    );
+
+    const destinationIndex = currentStations.findIndex(
+        station => station.name === destinationName
+    );
+
+    if (sourceIndex === -1 || destinationIndex === -1) {
+        return null;
+    }
+
+    // Source and destination cannot be the same.
+
+    if (sourceIndex === destinationIndex) {
+        return null;
+    }
+
+    const startIndex = Math.min(sourceIndex, destinationIndex);
+
+    const endIndex = Math.max(sourceIndex, destinationIndex);
+
+    let totalMinutes = 0;
+
+    // Calculate journey duration using existing timetable data.
+
+    for (let i = startIndex + 1; i <= endIndex; i++) {
+
+        totalMinutes += Number(
+            currentStations[i].minutes_from_previous
+        ) || 0;
+
+    }
+
+    // Determine journey direction.
+
+    const direction = destinationIndex < sourceIndex
+        ? "Towards Madavara"
+        : "Towards Silk Institute";
+
+    // Extract intermediate stations.
+
+    let routeStations = currentStations.slice(
+        startIndex,
+        endIndex + 1
+    );
+
+    // Reverse route when travelling towards Madavara.
+
+    if (destinationIndex < sourceIndex) {
+        routeStations.reverse();
+    }
+
+    const routeNames = routeStations.map(station => {
+
+        return stationNames[station.name]?.english || station.name;
+
+    });
+
+    return {
+        duration: totalMinutes,
+        direction: direction,
+        route: routeNames,
+        intermediateStations: routeNames.slice(1, -1)
+    };
+
+}
+
+
+// Display journey information on the website.
+
+function displayJourneyDetails() {
+
+    const sourceName =
+        document.getElementById("station").value;
+
+    const destinationName =
+        document.getElementById("destination-station").value;
+
+    const journeySection =
+        document.getElementById("journey-section");
+
+    const directionDisplay =
+        document.getElementById("journey-direction");
+
+    const durationDisplay =
+        document.getElementById("journey-duration");
+
+    const routeDisplay =
+        document.getElementById("journey-route");
+
+    const intermediateDisplay =
+        document.getElementById("journey-intermediate");
+
+    // Show journey information only when both stations are selected.
+
+    if (!sourceName || !destinationName) {
+
+        journeySection.hidden = true;
+
+        return;
+    }
+
+    journeySection.hidden = false;
+
+    // Handle same source and destination.
+
+    if (sourceName === destinationName) {
+
+        directionDisplay.textContent = "Invalid Journey";
+
+        durationDisplay.textContent = "--";
+
+        routeDisplay.textContent =
+            "Please select two different stations.";
+
+        intermediateDisplay.textContent = "";
+
+        return;
+    }
+
+    const journey = calculateJourney(
+        sourceName,
+        destinationName
+    );
+
+    if (!journey) {
+        return;
+    }
+
+    directionDisplay.textContent = journey.direction;
+
+    // Display duration in hours and minutes when appropriate.
+
+    const hours = Math.floor(journey.duration / 60);
+
+    const minutes = journey.duration % 60;
+
+    if (hours > 0) {
+
+        durationDisplay.textContent =
+            `${hours} hr ${minutes} min`;
+
+    } else {
+
+        durationDisplay.textContent =
+            `${minutes} min`;
+
+    }
+
+    // Display complete route.
+
+    routeDisplay.textContent =
+        journey.route.join(" → ");
+
+    // Display intermediate stations separately.
+
+    if (journey.intermediateStations.length > 0) {
+
+        intermediateDisplay.textContent =
+            "Intermediate stations: " +
+            journey.intermediateStations.join(", ");
+
+    } else {
+
+        intermediateDisplay.textContent =
+            "No intermediate stations. Direct journey.";
+
+    }
+
 }
 // Apply a minute offset to an HH:MM time
 
@@ -984,3 +1183,56 @@ if (
     document.getElementById("silk-position").textContent =
         stationDisplay;
 }
+// Update journey when destination station changes.
+
+document.getElementById("destination-station")
+    .addEventListener("change", function () {
+
+        displayJourneyDetails();
+
+    });
+
+
+// Update journey when source station changes.
+
+document.getElementById("station")
+    .addEventListener("change", function () {
+
+        displayJourneyDetails();
+
+    });
+
+
+// Swap source and destination stations.
+
+document.getElementById("swap-stations")
+    .addEventListener("click", function () {
+
+        const sourceSelect =
+            document.getElementById("station");
+
+        const destinationSelect =
+            document.getElementById("destination-station");
+
+        const oldSource = sourceSelect.value;
+
+        const oldDestination = destinationSelect.value;
+
+        if (!oldSource || !oldDestination) {
+            return;
+        }
+
+        sourceSelect.value = oldDestination;
+
+        destinationSelect.value = oldSource;
+
+        // Trigger existing train arrival calculations
+        // for the newly selected source station.
+
+        sourceSelect.dispatchEvent(
+            new Event("change")
+        );
+
+        displayJourneyDetails();
+
+    });
