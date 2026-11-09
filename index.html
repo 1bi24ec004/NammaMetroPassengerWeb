@@ -23,6 +23,7 @@
             <span class="status" id="clock">--:--:--</span>
         </header>
         <!-- Welcome section -->
+
 <section class="welcome-section">
 
     <img
@@ -32,6 +33,7 @@
     >
 
     <div class="welcome-content">
+
         <h2>Welcome to Green Line Passenger Information</h2>
 
         <p>
@@ -39,25 +41,100 @@
             and approximate train positions.
         </p>
 
-        <a
-            href="images/2.png"
-            target="_blank"
-            class="route-map-link"
-        >
-            View Green Line Route Map
-        </a>
+        <div class="welcome-actions">
+
+            <a
+                href="images/2.png"
+                target="_blank"
+                class="route-map-link"
+            >
+                View Green Line Route Map
+            </a>
+
+            <a
+                href="https://wa.me/918105556677?text=Hi"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="buy-ticket-link"
+            >
+                Buy Metro Tickets
+            </a>
+
+        </div>
+
     </div>
 
 </section>
 
-        <!-- Station Selection -->
-        <section class="station-selector">
-            <label for="station">SELECT YOUR STATION</label>
+
+
+
+<!-- Station Selection -->
+<section class="station-selector">
+
+    <div class="station-pair">
+
+        <!-- Source Station Card -->
+        <div class="station-field">
+
+            <label for="station">SELECT SOURCE STATION</label>
 
             <select id="station">
-                <option value="National College">National College</option>
+                <option value="">Select Source Station</option>
             </select>
-        </section>
+
+        </div>
+
+        <!-- Destination Station Card -->
+        <div class="station-field">
+
+            <label for="destination-station">
+                SELECT DESTINATION STATION
+            </label>
+
+            <select id="destination-station">
+                <option value="">Select Destination Station</option>
+            </select>
+
+        </div>
+
+    </div>
+
+    <button type="button" id="swap-stations">
+        ⇅ Swap Stations
+    </button>
+
+</section>
+
+
+<!-- Journey Information -->
+<section class="journey-section" id="journey-section" hidden>
+
+    <h2>Your Journey</h2>
+
+    <div class="journey-card">
+
+        <p class="journey-label">BOARD THIS DIRECTION</p>
+
+        <h3 id="journey-direction">--</h3>
+
+        <hr>
+
+        <p class="journey-label">APPROXIMATE JOURNEY DURATION</p>
+
+        <h3 id="journey-duration">--</h3>
+
+        <hr>
+
+        <p class="journey-label">YOUR ROUTE</p>
+
+        <p id="journey-route">Select your stations</p>
+
+        <p class="journey-intermediate" id="journey-intermediate"></p>
+
+    </div>
+
+</section>
 
         <!-- Upcoming Trains -->
         <section class="trains-section" hidden>
@@ -139,7 +216,7 @@
     <!-- Towards Madavara -->
     <div class="position-card">
 
-        <p class="direction">TOWARDS MADAVARA | PLATFORM 1 </p>
+        <p class="direction">TOWARDS MADAVARA | PLATFORM 1</p>
 
        <p class="position-label">
     Destination: <strong id="madavara-destination">Awaiting timetable</strong>
@@ -156,7 +233,7 @@
         <!-- Footer -->
         <footer class="footer">
 
-            <span>For delay metrics, refer PIDS Prototype dual LCD's</span>
+            <span>For delay metrics, view PIDS protoype LCD's</span>
 
             
 
