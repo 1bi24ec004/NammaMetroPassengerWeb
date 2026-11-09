@@ -705,4 +705,8 @@ body {
     outline: 2px solid #16834a;
     outline-offset: 2px;
 }
+/* Hide duplicate intermediate station display */
+.journey-intermediate {
+    display: none !important;
+}
 
