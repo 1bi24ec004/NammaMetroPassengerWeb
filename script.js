@@ -619,7 +619,7 @@ function getNextOccurrence(arrivalMinutes, currentDate) {
         const candidate = new Date(serviceDay);
         candidate.setMinutes(arrivalMinutes);
 
-        if (candidate.getTime() + 40000 > currentDate.getTime()) {
+        if (candidate.getTime() + 46000 > currentDate.getTime()) {
             if (nextArrival === null || candidate < nextArrival) {
                 nextArrival = candidate;
             }
@@ -727,6 +727,72 @@ function getUpcomingTrains(
 
     return upcomingTrains;
 }
+// Check whether an eligible train arrived at the selected station within the last minute
+function hasRecentlyArrived(
+    arrivals,
+    offsetMinutes,
+    currentDate,
+    selectedStation,
+    direction
+) {
+
+    const selectedIndex = currentStations.findIndex(
+        station => station.name === selectedStation
+    );
+
+    if (selectedIndex === -1) return false;
+
+    return arrivals.some(arrival => {
+
+        const destinationIndex = currentStations.findIndex(
+            station =>
+                station.name === arrival.destination ||
+                (station.name === "Silk Inst." &&
+                 arrival.destination === "Silk Institute")
+        );
+
+        if (destinationIndex === -1) return false;
+
+        let canReachSelectedStation = false;
+
+        if (direction === "madavara") {
+            canReachSelectedStation =
+                selectedIndex >= destinationIndex;
+        } else if (direction === "silk") {
+            canReachSelectedStation =
+                selectedIndex <= destinationIndex;
+        }
+
+        if (!canReachSelectedStation) return false;
+
+        const arrivalMinutes = getContinuousArrivalTime(
+            arrival.time,
+            offsetMinutes
+        );
+
+        for (let dayOffset = -1; dayOffset <= 1; dayOffset++) {
+
+            const serviceDay = new Date(currentDate);
+            serviceDay.setHours(0, 0, 0, 0);
+            serviceDay.setDate(serviceDay.getDate() + dayOffset);
+
+            const arrivalDate = new Date(serviceDay);
+            arrivalDate.setMinutes(arrivalMinutes);
+
+            const elapsedMilliseconds = currentDate - arrivalDate;
+
+            if (
+                elapsedMilliseconds >= 0 &&
+                elapsedMilliseconds <= 46000
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    });
+}
+
 async function testTimetables() {
 
     for (const [day, url] of Object.entries(timetableFiles)) {
@@ -1018,6 +1084,22 @@ document.getElementById("madavara-destination").textContent =
         madavaraTrains.slice(1, 4)
             .map(train => train.adjustedTime)
             .join(" · ");
+                if (hasRecentlyArrived(
+    currentTimetable.platforms.madavara.arrivals,
+    offsets.madavara,
+    new Date(),
+    selectedStation,
+    "madavara"
+))
+     {
+        const selectedStationName =
+            stationNames[selectedStation]?.english || selectedStation;
+
+        document.getElementById("madavara-position").textContent =
+            "Arrived at " + selectedStationName;
+
+        return;
+    }
                 // Estimate the current station of the next Madavara-bound train
 
     const remainingMinutesExact =
@@ -1136,6 +1218,22 @@ document.getElementById("silk-destination").textContent =
         silkTrains.slice(1, 4)
             .map(train => train.adjustedTime)
             .join(" · ");
+                if (hasRecentlyArrived(
+    currentTimetable.platforms.silk_institute.arrivals,
+    offsets.silk,
+    new Date(),
+    selectedStation,
+    "silk"
+))
+    {
+        const selectedStationName =
+            stationNames[selectedStation]?.english || selectedStation;
+
+        document.getElementById("silk-position").textContent =
+            "Arrived at " + selectedStationName;
+
+        return;
+    }
                 // Estimate the current station of the next Silk Institute-bound train
 
     const remainingMinutesExact =
