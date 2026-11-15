@@ -156,6 +156,7 @@ const timetableFiles = {
     sunday: "https://raw.githubusercontent.com/1bi24ec004/namma-metro/refs/heads/main/sunday.json"
 };
 
+
 // Prepare Monday arrivals using special early-morning timings
 
 function getMondayArrivals(arrivals, specialTimes, resumeTime) {
@@ -164,9 +165,10 @@ function getMondayArrivals(arrivals, specialTimes, resumeTime) {
         arrival.time >= resumeTime
     );
 
-    const mondaySpecialArrivals = specialTimes.map(time => ({
-        time: time,
-        destination: arrivals[0]?.destination
+    // Preserve each special train's time and actual origin
+    const mondaySpecialArrivals = specialTimes.map(item => ({
+        ...item,
+        destination: item.destination ?? arrivals[0]?.destination
     }));
 
     return [
@@ -174,6 +176,7 @@ function getMondayArrivals(arrivals, specialTimes, resumeTime) {
         ...regularArrivals
     ];
 }
+
 // Apply Monday-specific timetable exceptions
 
 function applyMondayExceptions(timetable) {
@@ -280,7 +283,76 @@ function populateStationDropdown(stations) {
 
 let currentStations = [];
 // Stores the currently active timetable
+// Normalize station names used differently in the timetable
+function normalizeStationName(name) {
 
+    if (name === "Silk Inst.") {
+        return "Silk Institute";
+    }
+
+    return name;
+}
+
+
+// Find a station's position in the Green Line sequence
+function getStationIndex(stationName) {
+
+    const normalizedName = normalizeStationName(stationName);
+
+    return currentStations.findIndex(station =>
+        normalizeStationName(station.name) === normalizedName
+    );
+}
+
+
+// Check whether a train's physical route includes the selected station
+function isStationOnTrainRoute(train, selectedStation) {
+
+    const originIndex = getStationIndex(train.origin);
+    const destinationIndex = getStationIndex(train.destination);
+    const selectedIndex = getStationIndex(selectedStation);
+
+    // Reject entries with missing or unrecognized route stations
+    if (
+        originIndex === -1 ||
+        destinationIndex === -1 ||
+        selectedIndex === -1
+    ) {
+        return false;
+    }
+
+    const routeStart = Math.min(originIndex, destinationIndex);
+    const routeEnd = Math.max(originIndex, destinationIndex);
+
+    return (
+        selectedIndex >= routeStart &&
+        selectedIndex <= routeEnd
+    );
+}
+
+
+// Select the correct National College offset for this train's direction
+function getTrainStationOffset(train, offsets) {
+
+    const originIndex = getStationIndex(train.origin);
+    const destinationIndex = getStationIndex(train.destination);
+
+    if (originIndex === -1 || destinationIndex === -1) {
+        return null;
+    }
+
+    // Increasing station index means travelling toward Silk Institute
+    if (destinationIndex > originIndex) {
+        return offsets.silk;
+    }
+
+    // Decreasing station index means travelling toward Madavara
+    if (destinationIndex < originIndex) {
+        return offsets.madavara;
+    }
+
+    return null;
+}
 let currentTimetable = null;
 let passengerStationSelected = false;
 // Detect passenger station selection and calculate upcoming trains
@@ -312,7 +384,7 @@ document.querySelector(".current-station").hidden = false;
 
     const madavaraTrains = getUpcomingTrains(
     currentTimetable.platforms.madavara.arrivals,
-    offsets.madavara,
+    offsets,
     now,
     selectedStation,
     "madavara"
@@ -320,7 +392,7 @@ document.querySelector(".current-station").hidden = false;
 
     const silkTrains = getUpcomingTrains(
     currentTimetable.platforms.silk_institute.arrivals,
-    offsets.silk,
+    offsets,
     now,
     selectedStation,
     "silk"
@@ -643,7 +715,7 @@ function getAdjustedArrivals(arrivals, offsetMinutes) {
 // Find upcoming trains that can reach the passenger's selected station
 function getUpcomingTrains(
     arrivals,
-    offsetMinutes,
+    offsets,
     currentDate,
     selectedStation,
     direction
@@ -651,10 +723,7 @@ function getUpcomingTrains(
 
     const upcomingTrains = [];
 
-    // Find the passenger's position in the original route order
-    const selectedIndex = currentStations.findIndex(
-        station => station.name === selectedStation
-    );
+    const selectedIndex = getStationIndex(selectedStation);
 
     if (selectedIndex === -1) {
         console.error("Selected station not found:", selectedStation);
@@ -663,41 +732,37 @@ function getUpcomingTrains(
 
     arrivals.forEach(arrival => {
 
-    
-        // Find this train's terminal destination in the route
-       const destinationIndex = currentStations.findIndex(
-    station =>
-        station.name === arrival.destination ||
-        (station.name === "Silk Inst." && arrival.destination === "Silk Institute")
-);
-        // Ignore entries with an unrecognised destination
-        if (destinationIndex === -1) {
-            console.warn("Unknown train destination:", arrival.destination);
+        const originIndex = getStationIndex(arrival.origin);
+        const destinationIndex = getStationIndex(arrival.destination);
+
+        // Reject trains with unrecognised route stations
+        if (originIndex === -1 || destinationIndex === -1) {
+            console.warn("Unknown train route:", arrival.origin, arrival.destination);
             return;
         }
 
-        // Check whether this train can reach the selected station
-        let canReachSelectedStation = false;
-
-        if (direction === "madavara") {
-
-            // Madavara direction travels backwards through the route
-            canReachSelectedStation =
-                selectedIndex >= destinationIndex;
-
-        } else if (direction === "silk") {
-
-            // Silk Institute direction travels forwards through the route
-            canReachSelectedStation =
-                selectedIndex <= destinationIndex;
-        }
-
-        // Do not display trains that terminate before the selected station
-        if (!canReachSelectedStation) {
+        // Confirm that the train physically serves the selected station
+        if (!isStationOnTrainRoute(arrival, selectedStation)) {
             return;
         }
 
-        // Existing arrival-time calculation remains unchanged
+        // Confirm that the train travels in the platform's direction
+        if (direction === "madavara" && destinationIndex >= originIndex) {
+            return;
+        }
+
+        if (direction === "silk" && destinationIndex <= originIndex) {
+            return;
+        }
+
+        // Select the National College offset for this train's direction
+        const offsetMinutes = getTrainStationOffset(arrival, offsets);
+
+        if (offsetMinutes === null) {
+            return;
+        }
+
+        // Timetable time is already referenced to National College
         const arrivalMinutes = getContinuousArrivalTime(
             arrival.time,
             offsetMinutes
@@ -720,7 +785,6 @@ function getUpcomingTrains(
         }
     });
 
-    // Existing chronological sorting remains unchanged
     upcomingTrains.sort((a, b) =>
         a.arrivalDate - b.arrivalDate
     );
@@ -730,40 +794,43 @@ function getUpcomingTrains(
 // Check whether an eligible train arrived at the selected station within the last minute
 function hasRecentlyArrived(
     arrivals,
-    offsetMinutes,
+    offsets,
     currentDate,
     selectedStation,
     direction
 ) {
 
-    const selectedIndex = currentStations.findIndex(
-        station => station.name === selectedStation
-    );
+    const selectedIndex = getStationIndex(selectedStation);
 
     if (selectedIndex === -1) return false;
 
     return arrivals.some(arrival => {
 
-        const destinationIndex = currentStations.findIndex(
-            station =>
-                station.name === arrival.destination ||
-                (station.name === "Silk Inst." &&
-                 arrival.destination === "Silk Institute")
-        );
+        const originIndex = getStationIndex(arrival.origin);
+        const destinationIndex = getStationIndex(arrival.destination);
 
-        if (destinationIndex === -1) return false;
-
-        let canReachSelectedStation = false;
-
-        if (direction === "madavara") {
-            canReachSelectedStation =
-                selectedIndex >= destinationIndex;
-        } else if (direction === "silk") {
-            canReachSelectedStation =
-                selectedIndex <= destinationIndex;
+        if (originIndex === -1 || destinationIndex === -1) {
+            return false;
         }
 
-        if (!canReachSelectedStation) return false;
+        // Confirm that the train travels in the platform's direction
+        if (direction === "madavara" && destinationIndex >= originIndex) {
+            return false;
+        }
+
+        if (direction === "silk" && destinationIndex <= originIndex) {
+            return false;
+        }
+
+        // Confirm that the train physically serves this station
+        if (!isStationOnTrainRoute(arrival, selectedStation)) {
+            return false;
+        }
+
+        // Select the correct offset for this train
+        const offsetMinutes = getTrainStationOffset(arrival, offsets);
+
+        if (offsetMinutes === null) return false;
 
         const arrivalMinutes = getContinuousArrivalTime(
             arrival.time,
@@ -792,7 +859,6 @@ function hasRecentlyArrived(
         return false;
     });
 }
-
 async function testTimetables() {
 
     for (const [day, url] of Object.entries(timetableFiles)) {
@@ -1038,7 +1104,7 @@ function updateMadavaraDisplay() {
 
     const madavaraTrains = getUpcomingTrains(
     currentTimetable.platforms.madavara.arrivals,
-    offsets.madavara,
+    offsets,
     new Date(),
     selectedStation,
     "madavara"
@@ -1086,11 +1152,12 @@ document.getElementById("madavara-destination").textContent =
             .join(" · ");
                 if (hasRecentlyArrived(
     currentTimetable.platforms.madavara.arrivals,
-    offsets.madavara,
+    offsets,
     new Date(),
     selectedStation,
     "madavara"
 ))
+
      {
         const selectedStationName =
             stationNames[selectedStation]?.english || selectedStation;
@@ -1100,47 +1167,35 @@ document.getElementById("madavara-destination").textContent =
 
         return;
     }
-                // Estimate the current station of the next Madavara-bound train
+// Estimate the current station of the next Madavara-bound train
 
-    const remainingMinutesExact =
-        remainingMilliseconds / 60000;
+const remainingMinutesExact =
+    remainingMilliseconds / 60000;
 
-    const selectedIndex = currentStations.findIndex(
-        station => station.name === selectedStation
+const selectedIndex = getStationIndex(selectedStation);
+const originIndex = getStationIndex(nextTrain.origin);
+
+let estimatedStation = nextTrain.origin;
+let accumulatedMinutes = 0;
+
+// Madavara-bound trains approach from higher station indexes
+for (let i = selectedIndex + 1; i <= originIndex; i++) {
+
+    accumulatedMinutes += Number(
+        currentStations[i].minutes_from_previous
     );
 
-    let estimatedStation = selectedStation;
-    let accumulatedMinutes = 0;
-
-    // Madavara-bound trains approach from Silk Institute
-    for (let i = selectedIndex + 1; i < currentStations.length; i++) {
-
-        accumulatedMinutes += Number(
-            currentStations[i].minutes_from_previous
-        );
-
-        if (accumulatedMinutes >= remainingMinutesExact) {
-            estimatedStation = currentStations[i].name;
-            break;
-        }
+    if (accumulatedMinutes >= remainingMinutesExact) {
+        estimatedStation = currentStations[i].name;
+        break;
     }
-    // Prevent the estimated station from going beyond the train's destination
-const destinationIndex = currentStations.findIndex(
-    station => station.name === nextTrain.destination
-);
-
-const estimatedIndex = currentStations.findIndex(
-    station => station.name === estimatedStation
-);
-
-if (
-    destinationIndex !== -1 &&
-    estimatedIndex !== -1 &&
-    estimatedIndex < destinationIndex
-) {
-    estimatedStation = currentStations[destinationIndex].name;
 }
+// Update the actual train origin and destination
+document.getElementById("madavara-origin").textContent =
+    nextTrain.origin;
 
+document.getElementById("madavara-destination").textContent =
+    nextTrain.destination;
     const stationDisplay =
         stationNames[estimatedStation]?.english || estimatedStation;
 
@@ -1172,7 +1227,7 @@ function updateSilkDisplay() {
 
     const silkTrains = getUpcomingTrains(
     currentTimetable.platforms.silk_institute.arrivals,
-    offsets.silk,
+    offsets,
     new Date(),
     selectedStation,
     "silk"
@@ -1220,7 +1275,7 @@ document.getElementById("silk-destination").textContent =
             .join(" · ");
                 if (hasRecentlyArrived(
     currentTimetable.platforms.silk_institute.arrivals,
-    offsets.silk,
+    offsets,
     new Date(),
     selectedStation,
     "silk"
@@ -1234,47 +1289,36 @@ document.getElementById("silk-destination").textContent =
 
         return;
     }
-                // Estimate the current station of the next Silk Institute-bound train
 
-    const remainingMinutesExact =
-        remainingMilliseconds / 60000;
+// Estimate the current station of the next Silk Institute-bound train
 
-    const selectedIndex = currentStations.findIndex(
-        station => station.name === selectedStation
+const remainingMinutesExact =
+    remainingMilliseconds / 60000;
+
+const selectedIndex = getStationIndex(selectedStation);
+const originIndex = getStationIndex(nextTrain.origin);
+
+let estimatedStation = nextTrain.origin;
+let accumulatedMinutes = 0;
+
+// Silk Institute-bound trains approach from lower station indexes
+for (let i = selectedIndex; i > originIndex; i--) {
+
+    accumulatedMinutes += Number(
+        currentStations[i].minutes_from_previous
     );
 
-    let estimatedStation = selectedStation;
-    let accumulatedMinutes = 0;
-
-    // Silk Institute-bound trains approach from Madavara
-    for (let i = selectedIndex; i > 0; i--) {
-
-        accumulatedMinutes += Number(
-            currentStations[i].minutes_from_previous
-        );
-
-        if (accumulatedMinutes >= remainingMinutesExact) {
-            estimatedStation = currentStations[i - 1].name;
-            break;
-        }
+    if (accumulatedMinutes >= remainingMinutesExact) {
+        estimatedStation = currentStations[i - 1].name;
+        break;
     }
-    // Prevent the estimated station from going beyond the train's destination
-const destinationIndex = currentStations.findIndex(
-    station => station.name === nextTrain.destination
-);
-
-const estimatedIndex = currentStations.findIndex(
-    station => station.name === estimatedStation
-);
-
-if (
-    destinationIndex !== -1 &&
-    estimatedIndex !== -1 &&
-    estimatedIndex > destinationIndex
-) {
-    estimatedStation = currentStations[destinationIndex].name;
 }
+// Update the actual train origin and destination
+document.getElementById("silk-origin").textContent =
+    nextTrain.origin;
 
+document.getElementById("silk-destination").textContent =
+    nextTrain.destination;
     const stationDisplay =
         stationNames[estimatedStation]?.english || estimatedStation;
 
