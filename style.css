@@ -177,7 +177,7 @@ body {
 .position-label {
     color: #638071;
     font-size: 13px;
-    margin: 0;
+    margin: 0 0 5px 0;
 }
 
 .position-label strong {
