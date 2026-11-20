@@ -1163,7 +1163,7 @@ document.getElementById("madavara-destination").textContent =
             stationNames[selectedStation]?.english || selectedStation;
 
         document.getElementById("madavara-position").textContent =
-            "Arrived at " + selectedStationName;
+            "Arriving soon at " + selectedStationName;
 
         return;
     }
@@ -1285,7 +1285,7 @@ document.getElementById("silk-destination").textContent =
             stationNames[selectedStation]?.english || selectedStation;
 
         document.getElementById("silk-position").textContent =
-            "Arrived at " + selectedStationName;
+            "Arriving soon at " + selectedStationName;
 
         return;
     }
